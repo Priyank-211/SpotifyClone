@@ -27,6 +27,7 @@ const DisplayHome = () => {
           {songsData.map((item, index) => (
             <SongItem
               key={item.id}
+              id={item.id}
               name={item.name}
               desc={item.desc}
               image={item.image}
