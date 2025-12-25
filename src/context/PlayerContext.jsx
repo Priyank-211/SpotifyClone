@@ -6,21 +6,17 @@ export const PlayerContext = createContext(null);
 const PlayerContextProvider = ({ children }) => {
   const audioRef = useRef(null);
   const seekBar = useRef(null);
+  const seekBg = useRef();
 
   const [track, setTrack] = useState(songsData[1]);
   const [playerStatus, setPlayerStatus] = useState(false);
-  const [time, setTime] = useState({
+  const [time, settime] = useState({
     currentTime: { minute: 0, second: 0 },
     totalTime: { minute: 0, second: 0 },
   });
 
-  useEffect(() => {
-    console.log("TRACK CHANGED TO:", track);
-  }, [track]);
-
   // 🔥 THIS is where play MUST happen
   const playWithId = async (id) => {
-    console.log("playWithId called with:", id);
     const song = songsData[id];
     const audio = audioRef.current;
 
@@ -37,6 +33,24 @@ const PlayerContextProvider = ({ children }) => {
     } catch (err) {
       console.log("Play failed:", err);
     }
+  };
+
+  const previous = async () => {
+    if (!track) return;
+    const currentindex = track.id;
+    const prevIndex =
+      currentindex === 0 ? songsData.length - 1 : currentindex - 1;
+
+    await playWithId(prevIndex);
+  };
+  const next = async () => {
+    if (!track) return;
+
+    const currentIndex = track.id;
+    const nextIndex =
+      currentIndex === songsData.length - 1 ? 0 : currentIndex + 1;
+
+    await playWithId(nextIndex);
   };
 
   const pause = () => {
@@ -60,6 +74,11 @@ const PlayerContextProvider = ({ children }) => {
       console.log("Play blocked:", err);
     }
   };
+  const seekSong = async (e) => {
+    audioRef.current.currentTime =
+      (e.nativeEvent.offsetX / seekBg.current.offsetWidth) *
+      audioRef.current.duration;
+  };
 
   // progress bar + time
   useEffect(() => {
@@ -73,7 +92,7 @@ const PlayerContextProvider = ({ children }) => {
         seekBar.current.style.width = progress + "%";
       }
 
-      setTime({
+      settime({
         currentTime: {
           minute: Math.floor(audio.currentTime / 60),
           second: Math.floor(audio.currentTime % 60),
@@ -94,12 +113,16 @@ const PlayerContextProvider = ({ children }) => {
       value={{
         audioRef,
         seekBar,
+        seekBg,
         track,
         playerStatus,
         time,
         playWithId,
         pause,
         play,
+        previous,
+        next,
+        seekSong,
       }}
     >
       {children}
