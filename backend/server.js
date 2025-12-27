@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
-//import songRouter from "./src/routes/songRoutes.js";
+import songRoutes from "./src/routes/songRoutes.js";
 import connectDB from "./src/config/mongodb.js";
 import connectCloudinary from "./src/config/cloudinary.js";
 import albumRoutes from "./src/routes/albumRoutes.js";
@@ -24,7 +24,7 @@ connectCloudinary();
 //app.use(cors());
 
 //initialising routes 
-//app.use("/api/song/",songRouter)
+app.use("/api/song",songRoutes)
 app.use("/api/albums", albumRoutes);
 
 app.post("/test", (req, res) => {
