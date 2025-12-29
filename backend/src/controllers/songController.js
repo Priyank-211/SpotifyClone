@@ -1,5 +1,8 @@
 import songModel from "../models/songModel.js";
 import { v2 as cloudinary } from "cloudinary";
+import "../models/albumModel.js";
+
+
 import fs from "fs";
 
 export const addSong = async (req, res) => {
@@ -42,6 +45,17 @@ export const addSong = async (req, res) => {
 
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+export const listSongs = async (req, res) => {
+  try {
+    const songs = await songModel
+      .find()
+      .populate("album", "name image"); // get album details
+
+    res.json(songs);
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };

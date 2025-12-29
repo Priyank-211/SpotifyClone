@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middleware/multer.js";
-import { addSong } from "../controllers/songController.js";
+import { addSong ,listSongs} from "../controllers/songController.js";
 
 const router = express.Router();
 
@@ -12,5 +12,5 @@ router.post(
   ]),
   addSong
 );
-
+router.get("/list", listSongs);
 export default router;
