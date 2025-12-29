@@ -21,7 +21,7 @@ app.use(express.json());
 connectDB();
 connectCloudinary();
 
-//app.use(cors());
+app.use(cors());
 
 //initialising routes 
 app.use("/api/song",songRoutes)

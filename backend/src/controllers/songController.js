@@ -38,7 +38,7 @@ export const addSong = async (req, res) => {
       duration,
     });
 
-    res.status(201).json(song);
+    res.status(201).json({ success: true, song });
 
   } catch (error) {
     console.error(error);

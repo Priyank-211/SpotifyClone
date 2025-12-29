@@ -26,3 +26,13 @@ export const addAlbum=async (req,res)=>{
       res.status(500).json({message:error.message});
   }
 };
+
+export const listAlbum= async (req,res) => {
+     try {
+    const album =await albumModel.find();
+    res.json(album);
+  } catch (error) {
+    res.status(500).json({message:error.message});
+    
+  }
+};

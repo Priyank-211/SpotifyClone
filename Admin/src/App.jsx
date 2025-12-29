@@ -9,7 +9,7 @@ import AddSong from "./pages/AddSong.jsx";
 import ListSong from "./pages/ListSong.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Navbar from "./components/Navbar.jsx";
-
+export const url = "http://localhost:4000";
 function App() {
   return (
     <div className="flex items-start min-h-screen">
