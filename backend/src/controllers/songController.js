@@ -59,3 +59,37 @@ export const listSongs = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const deleteSong = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const song = await songModel.findById(id);
+    if (!song) {
+      return res.status(404).json({ message: "Song not found" });
+    }
+
+    // Delete image from cloudinary
+    if (song.image) {
+      const imagePublicId = song.image.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(
+        `spotify/songs/images/${imagePublicId}`
+      );
+    }
+
+    // Delete audio from cloudinary
+    if (song.file) {
+      const audioPublicId = song.file.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(
+        `spotify/songs/audio/${audioPublicId}`,
+        { resource_type: "video" }
+      );
+    }
+
+    await songModel.findByIdAndDelete(id);
+
+    res.json({ success: true, message: "Song deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

@@ -7,20 +7,30 @@ const ListSong = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const res = await axios.get(`${url}/api/song/list`);
-        setSongs(res.data);
-        setLoading(false);
-      } catch (error) {
-        toast.error("Failed to load songs");
-        setLoading(false);
-      }
-    };
+  const fetchSongs = async () => {
+    try {
+      const res = await axios.get(`${url}/api/song/list`);
+      setSongs(res.data);
+      setLoading(false);
+    } catch (error) {
+      toast.error("Failed to load songs");
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSongs();
   }, []);
+  const deleteSong = async (id) => {
+    try {
+      await axios.delete(`${url}/api/song/delete/${id}`);
+
+      toast.success("song deleted");
+      await fetchSongs();
+    } catch (error) {
+      toast.error("delete failed");
+    }
+  };
 
   if (loading) {
     return (
@@ -70,7 +80,11 @@ const ListSong = () => {
             </p>
 
             {/* Action */}
-            <button className="text-red-500 text-center hover:underline">
+            <button
+              on
+              onClick={() => deleteSong(song._id)}
+              className="text-red-500 text-center hover:underline"
+            >
               ✕
             </button>
           </div>
