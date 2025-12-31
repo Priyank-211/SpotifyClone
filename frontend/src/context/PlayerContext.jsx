@@ -1,5 +1,5 @@
 import { createContext, useRef, useState, useEffect } from "react";
-import { songsData } from "../assets/assets";
+import axios from "axios";
 
 export const PlayerContext = createContext(null);
 
@@ -8,7 +8,12 @@ const PlayerContextProvider = ({ children }) => {
   const seekBar = useRef(null);
   const seekBg = useRef();
 
-  const [track, setTrack] = useState(songsData[1]);
+  const url = "http://localhost:4000";
+
+  const [songsData, setsongsData] = useState([]);
+  const [albumsdata, setalbumsdata] = useState([]);
+
+  const [track, setTrack] = useState(null);
   const [playerStatus, setPlayerStatus] = useState(false);
   const [time, settime] = useState({
     currentTime: { minute: 0, second: 0 },
@@ -34,10 +39,14 @@ const PlayerContextProvider = ({ children }) => {
       console.log("Play failed:", err);
     }
   };
+  const getIndexById = (id) => {
+    return songsData.findIndex((song) => song._id === id);
+  };
 
   const previous = async () => {
-    if (!track) return;
-    const currentindex = track.id;
+    const currentindex = getIndexById(track._id);
+    if (currentindex === -1) return;
+
     const prevIndex =
       currentindex === 0 ? songsData.length - 1 : currentindex - 1;
 
@@ -46,7 +55,8 @@ const PlayerContextProvider = ({ children }) => {
   const next = async () => {
     if (!track) return;
 
-    const currentIndex = track.id;
+    const currentIndex = getIndexById(track._id);
+    if (currentIndex === -1) return;
     const nextIndex =
       currentIndex === songsData.length - 1 ? 0 : currentIndex + 1;
 
@@ -79,7 +89,19 @@ const PlayerContextProvider = ({ children }) => {
       (e.nativeEvent.offsetX / seekBg.current.offsetWidth) *
       audioRef.current.duration;
   };
-
+  const getSongs = async () => {
+    try {
+      const res = await axios.get(`${url}/api/song/list`);
+      setsongsData(res.data);
+      setTrack(res.data[0]);
+    } catch (error) {}
+  };
+  const getalbums = async () => {
+    try {
+      const response = await axios.get(`${url}/api/albums/list`);
+      setalbumsdata(response.data);
+    } catch (error) {}
+  };
   // progress bar + time
   useEffect(() => {
     const audio = audioRef.current;
@@ -108,6 +130,11 @@ const PlayerContextProvider = ({ children }) => {
     return () => audio.removeEventListener("timeupdate", update);
   }, []);
 
+  useEffect(() => {
+    getSongs();
+    getalbums();
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -123,6 +150,8 @@ const PlayerContextProvider = ({ children }) => {
         previous,
         next,
         seekSong,
+        songsData,
+        albumsdata,
       }}
     >
       {children}

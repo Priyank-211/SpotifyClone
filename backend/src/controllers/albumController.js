@@ -6,7 +6,7 @@ export const addAlbum=async (req,res)=>{
   try{
     const{name,desc ,bgColor}= req.body;
     if(!req.file){
-      return res.status(400).json({messsage: "Iamge is required"});
+      return res.status(400).json({message: "Iamge is required"});
     }
 
   //upload image to cloudinary
@@ -15,7 +15,7 @@ export const addAlbum=async (req,res)=>{
   //delete local file
   fs.unlinkSync(req.file.path);
 
-  //ave album in Db
+  //save album in Db
   const album =await albumModel.create({
     name,desc,bgColor,image:result.secure_url
   });
@@ -34,5 +34,31 @@ export const listAlbum= async (req,res) => {
   } catch (error) {
     res.status(500).json({message:error.message});
     
+  }
+};
+export const deleteAlbum = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1️⃣ Find album
+    const album = await albumModel.findById(id);
+    if (!album) {
+      return res.status(404).json({ message: "Album not found" });
+    }
+
+    // 2️⃣ Delete album image from Cloudinary
+    if (album.image) {
+      const albumImgId = album.image.split("/").pop().split(".")[0];
+      await Cloudinary.uploader.destroy(`spotify/albums/${albumImgId}`);
+    }
+
+    // 3️⃣ Delete album from DB
+    await albumModel.findByIdAndDelete(id);
+
+    res.json({ success: true, message: "Album deleted" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 };
