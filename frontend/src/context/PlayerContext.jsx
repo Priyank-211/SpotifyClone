@@ -44,23 +44,25 @@ const PlayerContextProvider = ({ children }) => {
   };
 
   const previous = async () => {
+    if (!track) return;
     const currentindex = getIndexById(track._id);
     if (currentindex === -1) return;
 
     const prevIndex =
       currentindex === 0 ? songsData.length - 1 : currentindex - 1;
 
-    await playWithId(prevIndex);
+    await playWithId(songsData[prevIndex]._id);
   };
   const next = async () => {
     if (!track) return;
 
     const currentIndex = getIndexById(track._id);
     if (currentIndex === -1) return;
+
     const nextIndex =
       currentIndex === songsData.length - 1 ? 0 : currentIndex + 1;
 
-    await playWithId(nextIndex);
+    await playWithId(songsData[nextIndex]._id);
   };
 
   const pause = () => {
