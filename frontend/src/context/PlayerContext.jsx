@@ -21,19 +21,19 @@ const PlayerContextProvider = ({ children }) => {
   });
 
   // 🔥 THIS is where play MUST happen
-  const playWithId = async (id) => {
-    const song = songsData[id];
+  const playWithId = async (songId) => {
+    const song = songsData.find((s) => s._id === songId);
+
     const audio = audioRef.current;
 
     if (!song || !audio) return;
 
     try {
-      audio.pause(); // stop current
-      audio.src = song.file; // set new src
-      audio.load(); // load it
+      audio.pause();
+      audio.src = song.file;
+      audio.load();
       setTrack(song);
-      await audio.play(); // USER CLICK → allowed
-
+      await audio.play();
       setPlayerStatus(true);
     } catch (err) {
       console.log("Play failed:", err);
